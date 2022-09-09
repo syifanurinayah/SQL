@@ -1,0 +1,15 @@
+select * from
+        (SELECT country,
+        coalesce(gold,0) as gold,
+        coalesce(silver,0) as silver,
+        coalesce(bronze,0) as bronze
+        FROM CROSSTAB('select nr.region as country,medal, count(1) as total_medal
+                        from olympics_history oh
+                        join olympics_history_noc_regions nr on nr.noc = oh.noc
+                        where medal <> ''NA''
+                        group by nr.region,medal',
+                     'values (''Bronze''), (''Silver''), (''Gold'')')
+              AS FINAL_RESULT(country varchar, bronze bigint, silver bigint, gold bigint)) x
+              where gold = 0 and (silver > 0 or bronze > 0)
+              order by gold desc nulls last, silver desc nulls last, bronze desc nulls last;
+         

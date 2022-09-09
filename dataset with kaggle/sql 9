@@ -1,0 +1,13 @@
+with t1 as
+       ( select 
+        name, sex, cast(case when age ='NA' then '0' else age end as int) as age, team, games, city, sport, event, medal
+        from olympics_history
+        where medal='Gold'),
+     t2 as
+        (select *,
+        rank() over(order by age desc) as rnk
+        from t1
+        where medal='Gold')
+select *
+from t2
+where rnk=1;

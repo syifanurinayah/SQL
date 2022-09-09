@@ -1,0 +1,13 @@
+with t1 as
+        (select *, row_number() over() as id
+        from vw_weather),
+     t2 as 
+        (select *, id - row_number() over(order by id) as df
+        from t1
+        where t1.temperature < 0),
+     t3 as
+        (select *, count(*) over(partition by df order by df) as cnt
+        from t2)     
+select city, temperature
+from t3
+where  t3.cnt = 4;

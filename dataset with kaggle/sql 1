@@ -1,0 +1,2 @@
+select count(distinct games) as total_olympics_games
+from olympics_history;

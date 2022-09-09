@@ -1,0 +1,8 @@
+select a.month,a.account_id,a.no_of_unique_patient 
+from (select x.month, x.account_id, no_of_unique_patient,
+      row_number() over(partition by x.month order by x.no_of_unique_patient desc) as rn
+      from (select pl.month, pl.account_id, count(1) as no_of_unique_patient
+           from (select distinct to_char(date,'month') as month, account_id, patient_id
+                                        from patient_logs) pl
+                group by pl.month, pl.account_id) x) a
+     where a.rn < 3;

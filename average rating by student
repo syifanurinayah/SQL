@@ -1,0 +1,13 @@
+-- 1.Calculate the average rating given by students to each teacher for each session created.
+-- Also, provide the batch name for which session was conducted.
+-- a. find the ttalstudent in for session
+
+-- attendances, sessions, batches
+
+select att.session_id, b.name as batch, u.name as teacher, round(avg(att.rating)::decimal,2) as rating
+from attendances att
+join sessions s on s.id = att.session_id
+join batches b on b.id = s.batch_id
+join users u on u.id = s.conducted_by
+group by att.session_id, b.name, u.name
+order by 1;

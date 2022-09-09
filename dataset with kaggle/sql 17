@@ -1,0 +1,40 @@
+with t1 as 
+        (SELECT 
+        substring(games,1,position(' - ' in games) - 1) as games
+            , substring(games,position(' - ' in games) + 3) as country
+            , coalesce(gold, 0) as gold
+            , coalesce(silver, 0) as silver
+            , coalesce(bronze, 0) as bronze
+        FROM CROSSTAB('SELECT concat(games, '' - '', nr.region) as games
+                    , medal
+                    , count(1) as total_medals
+                    FROM olympics_history oh
+                    JOIN olympics_history_noc_regions nr ON nr.noc = oh.noc
+                    where medal <> ''NA''
+                    GROUP BY games,nr.region,medal
+                    order BY games,medal',
+                'values (''Bronze''), (''Gold''), (''Silver'')')
+        AS FINAL_RESULT(games text, bronze bigint, gold bigint, silver bigint)),
+     total_medals as
+         (select games, nr.region as country, count(1) as total_medal
+         from olympics_history oh
+         join olympics_history_noc_regions nr on nr.noc = oh.noc
+         where games <> 'NA'
+         group by games, nr.region
+         order by 1,2)
+select distinct t.games,
+    concat(first_value(t.country) over(partition by t.games order by gold desc),
+          ' - ', 
+          first_value(t.gold) over(partition by t.games order by gold desc)) as max_gold,
+    concat(first_value(t.country) over(partition by t.games order by silver desc),
+          ' - ', 
+          first_value(t.silver) over(partition by t.games order by silver desc)) as max_silver,
+    concat(first_value(t.country) over(partition by t.games order by bronze desc),
+          ' - ', 
+          first_value(t.bronze) over(partition by t.games order by bronze desc)) as max_bronze,
+    concat(first_value(tm.country) over(partition by tm.games order by total_medal desc nulls last),
+          ' - ', 
+          first_value(tm.total_medal) over(partition by tm.games order by total_medal desc nulls last)) as max_medals
+from t1 t
+join total_medals tm on tm.games = t.games and tm.country = t.country
+order by games;

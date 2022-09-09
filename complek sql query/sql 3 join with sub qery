@@ -1,0 +1,11 @@
+select ps.speciality, count(1) as speciality_count
+from physician_speciality ps
+join patient_treatment pt on pt.physician_id = ps.physician_id
+join event_category ec on ec.event_name = pt.event_name
+where ec.category = 'Procedure' and pt.physician_id not in (select pt2.physician_id from patient_treatment
+                                                           pt2
+                                                           join event_category ec on ec.event_name = 
+                                                           pt2.event_name
+                                                           where ec.category = 'Prescription')
+group by ps.speciality;
+;

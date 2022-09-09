@@ -1,0 +1,9 @@
+select d.name, d.speciality, d.hospital
+from doctors d
+join doctors e
+on e.hospital = d.hospital and e.speciality <> d.speciality and e.id <> d.id;
+
+select d.name, d.speciality, d.hospital
+from doctors d
+join doctors e
+on e.hospital = d.hospital and e.id <> d.id;

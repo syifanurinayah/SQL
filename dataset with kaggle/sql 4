@@ -1,0 +1,15 @@
+with t1 as
+        (select oh.games, nr.region
+        from olympics_history oh
+        join olympics_history_noc_regions nr on nr.noc = oh.noc
+        group by oh.games, nr.region),
+    t2 as
+        (select games, count(1) as total_countries
+        from t1
+        group by games)
+select distinct concat(first_value(games) over(order by total_countries), ' - ',
+             first_value(total_countries) over(order by total_countries)) as lowest_countries,
+       concat(first_value(games) over(order by total_countries desc), ' - ',
+             first_value(total_countries) over(order by total_countries desc)) as high_countries
+from t2
+order by 1;

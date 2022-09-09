@@ -1,0 +1,5 @@
+select team, sport, games, count(1) as total_medal
+        from olympics_history
+        where medal <> 'NA' AND team = 'India' and sport = 'Hockey'
+        group by sport, team, games;
+     

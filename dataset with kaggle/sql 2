@@ -1,0 +1,3 @@
+select distinct year, season, city
+from olympics_history
+order by year;

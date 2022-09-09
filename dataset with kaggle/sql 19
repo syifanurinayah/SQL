@@ -1,0 +1,10 @@
+with t1 as         
+        (select sport, count(1) as total_medal
+        from olympics_history
+        where medal <> 'NA' AND team = 'India'
+        group by sport),
+     t2 as 
+        (select *, rank() over(order by total_medal desc) as rnk
+        from t1)
+select sport, total_medal from t2
+where rnk =1;

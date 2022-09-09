@@ -1,0 +1,12 @@
+with t1 as
+    (select name, count(1) as total_medal
+    from olympics_history
+    where medal = 'Gold'
+    group by name
+    order by count(1) desc),
+t2 as
+    (select *, dense_rank() over(order by total_medal desc) as rnk
+    from t1)
+select *
+from t2
+where rnk <=5;

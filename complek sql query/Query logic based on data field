@@ -1,0 +1,10 @@
+with t1 as
+          (select *, row_number() over(order by order_date) as rn,
+          order_date - cast(row_number() over(order by order_date)::numeric as int) as dif
+          from orders),
+      t2 as 
+           (select *, count(1) over(partition by dif) as cnt
+           from t1)
+select order_id, order_date 
+from t2
+where t2.cnt = 3;

@@ -1,0 +1,11 @@
+with t1 as
+        (select *, id -  row_number() over(order by id) as df
+        from weather w
+        where w.temperature < 0),
+     t2 as
+        (select *, count(*) over(partition by df order by df) as ctn
+        from t1)
+select id, city, temperature, day
+from t2
+where t2.ctn = 5;
+
