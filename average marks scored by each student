@@ -1,0 +1,16 @@
+select * from users;
+select * from batches;
+select * from student_batch_maps;
+select * from instructor_batch_maps;
+select * from sessions;
+select * from attendances;
+select * from tests;
+select * from test_scores;
+
+--What is the average marks scored by each student in all the tests the student had appeared?
+
+select ts.user_id, u.name, round(avg(score),2) as score
+from test_scores ts
+join users u on u.id = ts.user_id
+group by ts.user_id, u.name
+order by 1;

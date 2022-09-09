@@ -30,8 +30,10 @@ with student_in_batch as
             where (a.student_id,s.batch_id) not in(select user_id, inactive_batch
                                                   from multiple_batch_student)
             group by session_id)
-select si.batch_id, sp.session_id, student_in_batch, 
-student_present,round((si.student_in_batch/sp.student_present::decimal)*100,2)
+select s.id,b.name as batch, u.name as teacher, si.student_in_batch, 
+sp.student_present,round((si.student_in_batch/sp.student_present::decimal)*100,2)
 from sessions s
 join student_in_batch si on si.batch_id = s.batch_id
-join student_present sp on sp.session_id = s.id;
+join student_present sp on sp.session_id = s.id
+join batches b on b.id = s.batch_id
+join users u on u.id = s.conducted_by;
