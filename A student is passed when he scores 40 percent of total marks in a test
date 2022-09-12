@@ -1,0 +1,22 @@
+select * from users;
+select * from batches;
+select * from student_batch_maps;
+select * from instructor_batch_maps;
+select * from sessions;
+select * from attendances;
+select * from tests;
+select * from test_scores;
+
+--A student is passed when he scores 40 percent of total marks in a test. 
+--Find out how many students passed in each test. Also mention the batch name for that test
+
+select ts.test_id, b.name as batches, count(1) as student_pased
+from tests t
+left join test_scores ts on t.id = ts.test_id
+join users u on u.id = ts.user_id
+join batches b on b.id = t.batch_id
+where ((ts.score::decimal/t.total_mark::decimal)*100) >= 40
+group by ts.test_id,b.name
+order by 1;
+
+

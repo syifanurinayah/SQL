@@ -1,0 +1,22 @@
+select * from users;
+select * from batches;
+select * from student_batch_maps;
+select * from instructor_batch_maps;
+select * from sessions;
+select * from attendances;
+select * from tests;
+select * from test_scores;
+
+--What is the average percentage of marks scored by each student in all the tests the student had appeared?
+
+with percentage_marks as
+                (select u.name as student, ts.test_id, t.total_mark, ts.score, 
+                 round(avg(ts.score::decimal/t.total_mark::decimal)*100,2) as mark_percentage
+                 from users u
+                 join test_scores ts on ts.user_id = u.id
+                 join tests t on t.id = ts.test_id
+                group by student,ts.test_id, t.total_mark, ts.score)
+select student, round(avg(mark_percentage),2) as avg_marks_percent
+from percentage_marks
+group by student
+order by 1;
