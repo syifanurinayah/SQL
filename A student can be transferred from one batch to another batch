@@ -1,0 +1,26 @@
+with total_sessions as
+		(select SBM.user_id as student_id, count(1) as total_sessions_per_student
+		from student_batch_maps SBM
+		join sessions s on s.batch_id = SBM.batch_id
+		where SBM.active = true
+		group by SBM.user_id
+		order by 1),
+	multiple_batch_students as
+		(select inactive.user_id, inactive.batch_id as inactive_batch,active.batch_id  as active_batch
+		from student_batch_maps active
+		join student_batch_maps inactive on active.user_id = inactive.user_id
+		where active.active = true
+		and inactive.active = false),
+	attended_sessions as
+		(select student_id, count(1) as sessions_attended_by_student
+		from attendances a
+		join sessions s on s.id = a.session_id
+		where (a.student_id, s.batch_id) not in (select user_id, inactive_batch
+                                                 from multiple_batch_students)
+		group by student_id)
+select u.name as student
+, round((coalesce(sessions_attended_by_student,0)::decimal/total_sessions_per_student::decimal) * 100,2) as student_attendence_percentage
+from total_sessions TS
+left join attended_sessions ATTS on ATTS.student_id = TS.student_id
+join users u on u.id = TS.student_id
+order by 1;
