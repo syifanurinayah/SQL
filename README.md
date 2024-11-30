@@ -1,1 +1,1 @@
-Di sini saya belajar SQL memanipulasi data menggunakan RDBMS PostgreSQL
+Di sini saya belajar memanipulasi data menggunakan RDBMS PostgreSQL
